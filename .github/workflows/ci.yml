@@ -1,0 +1,37 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [18.x, 20.x, 22.x]
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v6.0.2
+
+            - name: Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v6.3.0
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "yarn"
+
+            - name: Install Dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Lint Code
+              run: yarn lint
+
+            - name: Type Check
+              run: yarn type-check
+
+            - name: Build Library
+              run: yarn build
