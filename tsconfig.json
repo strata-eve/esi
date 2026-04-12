@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "target": "esnext",
+        "types": ["node"],
+        "lib": ["esnext"],
+
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+
+        "strict": true,
+        "jsx": "react-jsx",
+        "verbatimModuleSyntax": false,
+        "isolatedModules": true,
+        "noUncheckedSideEffectImports": true,
+        "moduleDetection": "force",
+        "skipLibCheck": true
+    },
+    "include": ["src/**/*", "scripts/**/*"],
+    "exclude": ["node_modules", "dist", "**/*.config.mts"]
+}
