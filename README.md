@@ -12,6 +12,13 @@ The endpoint methods and TypeScript interfaces are automatically generated from 
 specification. It also includes an internal queue manager to handle rate limits and HTTP 429 responses
 automatically.
 
+> [!CAUTION]  
+> This project is in early development. It is not ready for production.
+> Breaking changes will happen.
+
+> [!WARNING]
+> Use this library at your own risk. The authors are not responsible for any damage, loss of ISK, API bans, or other problems caused by using this code. Do not use this on your main EVE Online characters or in live applications without testing.
+
 ## Installation
 
 Install the package via npm or your preferred package manager:
