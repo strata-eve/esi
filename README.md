@@ -1,4 +1,11 @@
-# @strata-eve/esi
+<div align="center">
+    <h1><code>@strata-eve/esi</code></h1>
+    <img src="https://img.shields.io/github/actions/workflow/status/strata-eve/esi/ci.yml?style=flat-square"/>
+    <img src="https://img.shields.io/github/license/strata-eve/esi?style=flat-square"/>
+    <img src="https://img.shields.io/github/package-json/v/strata-eve/esi?style=flat-square"/>
+    <img src="https://img.shields.io/badge/sponsor-send%201B%20ISK%20I'll%20send%202B-blueviolet?style=flat-square">
+</div>
+<hr/>
 
 A TypeScript client for the [EVE Online ESI](https://developers.eveonline.com/docs/services/esi/overview).
 The endpoint methods and TypeScript interfaces are automatically generated from the official ESI OpenAPI
