@@ -6,12 +6,15 @@ import { EsiScope, GeneratedApi } from "../api/GeneratedApi";
 import { EsiRequester } from "./EsiRequester";
 import { TokenProvider } from "../auth/TokenProvider";
 import { createAuthMiddleware } from "../middlewares/auth";
-import { PublicCharacter } from "../domains/Character";
 import { EsiApiError } from "../core/errors";
 import { AuthClient } from "./AuthClient";
-import { PublicAlliance } from "../domains/Alliance";
-import { PublicCorporation } from "../domains/Corporation";
 import { camelToSnakeObj, snakeToCamelObj } from "../utils/transformer";
+import {
+    PublicCharacter,
+    PublicAlliance,
+    PublicCorporation,
+    PublicContract,
+} from "../domains";
 
 /**
  * Configuration object for the HTTP User-Agent header.
@@ -306,5 +309,21 @@ export class EsiClient implements EsiRequester {
      */
     public corporation(id: number) {
         return new PublicCorporation(this.api, id);
+    }
+
+    /**
+     * Retrieves a domain wrapper for contract operations.
+     *
+     * @param id - The EVE Online contract ID.
+     */
+    public contract(id: number) {
+        return new PublicContract(this.api, id);
+    }
+
+    /**
+     * Retrieves paginated list of all public contracts in the given region
+     */
+    public async contracts(regionId: number, page?: number) {
+        return this.api.getContractsPublicRegionId(regionId, page);
     }
 }

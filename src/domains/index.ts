@@ -13,3 +13,4 @@ export * from "./Mail";
 export * from "./Market";
 export * from "./Skills";
 export * from "./Wallet";
+export * from "./Contract";

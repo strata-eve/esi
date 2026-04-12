@@ -15,10 +15,4 @@ export class AuthClient {
     public alliance(id: number) {
         return new AuthAlliance(this.api, id);
     }
-
-    public async alliances() {
-        const info = await this.api.getAlliances();
-
-        return info.map((id) => new AuthAlliance(this.api, id));
-    }
 }
