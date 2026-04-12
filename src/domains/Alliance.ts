@@ -1,6 +1,5 @@
 import { GeneratedApi } from "../api/GeneratedApi";
 import { AllianceContacts } from "./Contacts";
-import { PublicCorporation } from "./Corporation";
 
 export class PublicAlliance {
     constructor(
@@ -12,12 +11,10 @@ export class PublicAlliance {
         return this.api.getAlliancesAllianceId(this.id);
     }
 
-    public async corporations() {
-        const corps = await this.api.getAlliancesAllianceIdCorporations(
-            this.id,
-        );
-
-        return corps.map((id) => new PublicCorporation(this.api, id));
+    public get corporations() {
+        return {
+            list: () => this.api.getAlliancesAllianceIdCorporations(this.id),
+        };
     }
 
     public async icons() {
@@ -30,11 +27,7 @@ export class AuthAlliance extends PublicAlliance {
         super(api, id);
     }
 
-    public async contacts() {
+    public get contacts() {
         return new AllianceContacts(this.api, this.id);
-    }
-
-    public async contactLabels() {
-        return this.api.getAlliancesAllianceIdContactsLabels(this.id);
     }
 }

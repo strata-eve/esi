@@ -40,6 +40,24 @@ export class PublicCharacter {
 
         return new PublicCorporation(this.api, info.corporationId);
     }
+
+    public async corporationHistory() {
+        const info = await this.api.getCharactersCharacterIdCorporationhistory(
+            this.id,
+        );
+
+        return info.map((record) => {
+            return {
+                corporation: new PublicCorporation(
+                    this.api,
+                    record.corporationId,
+                ),
+                isDeleted: record.isDeleted,
+                recordId: record.recordId,
+                startDate: record.startDate,
+            };
+        });
+    }
 }
 
 export class AuthCharacter extends PublicCharacter {
@@ -83,24 +101,6 @@ export class AuthCharacter extends PublicCharacter {
         return new PublicCorporation(this.api, info.corporationId);
     }
 
-    public async corporationHistory() {
-        const info = await this.api.getCharactersCharacterIdCorporationhistory(
-            this.id,
-        );
-
-        return info.map((record) => {
-            return {
-                corporation: new PublicCorporation(
-                    this.api,
-                    record.corporationId,
-                ),
-                isDeleted: record.isDeleted,
-                recordId: record.recordId,
-                startDate: record.startDate,
-            };
-        });
-    }
-
     public async cspaCost(characterIds: number[]) {
         return this.api.postCharactersCharacterIdCspa(this.id, characterIds);
     }
@@ -114,9 +114,13 @@ export class AuthCharacter extends PublicCharacter {
     }
 
     public async fleet() {
-        const info = await Fleet.characterInfo(this.api, this.id);
+        const info = await this.fleetInfo();
 
-        return new Fleet(this.api, this.id, info.fleetId);
+        return new Fleet(this.api, info.fleetId);
+    }
+
+    public async fleetInfo() {
+        return this.api.getCharactersCharacterIdFleet(this.id);
     }
 
     public async implants() {

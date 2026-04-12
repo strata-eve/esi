@@ -6,14 +6,17 @@ export class CharacterColonies {
         readonly characterId: number,
     ) {}
 
-    public async fetch() {
+    public async list() {
         return this.api.getCharactersCharacterIdPlanets(this.characterId);
     }
 
-    public async get(colonyId: number) {
-        return this.api.getCharactersCharacterIdPlanetsPlanetId(
-            this.characterId,
-            colonyId,
-        );
+    public colony(colonyId: number) {
+        return {
+            fetch: () =>
+                this.api.getCharactersCharacterIdPlanetsPlanetId(
+                    this.characterId,
+                    colonyId,
+                ),
+        };
     }
 }

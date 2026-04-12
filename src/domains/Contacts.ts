@@ -6,12 +6,15 @@ export class AllianceContacts {
         readonly allianceId: number,
     ) {}
 
-    async fetch() {
-        return this.api.getAlliancesAllianceIdContacts(this.allianceId);
+    async list(page?: number) {
+        return this.api.getAlliancesAllianceIdContacts(this.allianceId, page);
     }
 
-    async labels() {
-        return this.api.getAlliancesAllianceIdContactsLabels(this.allianceId);
+    public get labels() {
+        return {
+            list: () =>
+                this.api.getAlliancesAllianceIdContactsLabels(this.allianceId),
+        };
     }
 }
 
@@ -21,17 +24,23 @@ export class CharacterContacts {
         readonly characterId: number,
     ) {}
 
-    async fetch() {
-        return this.api.getCharactersCharacterIdContacts(this.characterId);
-    }
-
-    async labels() {
-        return this.api.getCharactersCharacterIdContactsLabels(
+    public async list(page?: number) {
+        return this.api.getCharactersCharacterIdContacts(
             this.characterId,
+            page,
         );
     }
 
-    async add(
+    public get labels() {
+        return {
+            list: () =>
+                this.api.getCharactersCharacterIdContactsLabels(
+                    this.characterId,
+                ),
+        };
+    }
+
+    public async add(
         contact: number | number[],
         standing: number,
         labelIds?: number[],
@@ -46,7 +55,7 @@ export class CharacterContacts {
         );
     }
 
-    async edit(
+    public async edit(
         contact: number | number[],
         standing: number,
         labelIds?: number[],
@@ -61,7 +70,7 @@ export class CharacterContacts {
         );
     }
 
-    async delete(contact: number | number[]) {
+    public async delete(contact: number | number[]) {
         return this.api.deleteCharactersCharacterIdContacts(
             this.characterId,
             Array.isArray(contact) ? contact : [contact],

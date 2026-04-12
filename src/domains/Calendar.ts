@@ -1,42 +1,51 @@
 import { GeneratedApi } from "../api/GeneratedApi";
 
-export class Calendar {
+export class CalendarEvent {
     constructor(
         readonly api: GeneratedApi,
         readonly characterId: number,
+        readonly eventId: number,
     ) {}
 
-    public async fetch(fromEvent?: number) {
-        return this.api.getCharactersCharacterIdCalendar(
-            this.characterId,
-            fromEvent,
-        );
-    }
-
-    public async get(eventId: number) {
+    public async fetch() {
         return this.api.getCharactersCharacterIdCalendarEventId(
             this.characterId,
-            eventId,
+            this.eventId,
         );
     }
 
-    public async respond(
-        eventId: number,
-        response: "accepted" | "declined" | "tentative",
-    ) {
+    public async respond(response: "accepted" | "declined" | "tentative") {
         return this.api.putCharactersCharacterIdCalendarEventId(
             this.characterId,
-            eventId,
+            this.eventId,
             {
                 response,
             },
         );
     }
 
-    public async attendees(eventId: number) {
+    public async attendees() {
         return this.api.getCharactersCharacterIdCalendarEventIdAttendees(
             this.characterId,
-            eventId,
+            this.eventId,
         );
+    }
+}
+
+export class Calendar {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly characterId: number,
+    ) {}
+
+    public async list(fromEvent?: number) {
+        return this.api.getCharactersCharacterIdCalendar(
+            this.characterId,
+            fromEvent,
+        );
+    }
+
+    public event(eventId: number) {
+        return new CalendarEvent(this.api, this.characterId, eventId);
     }
 }

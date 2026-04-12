@@ -6,8 +6,11 @@ export class CharacterContracts {
         readonly characterId: number,
     ) {}
 
-    public async fetch() {
-        return this.api.getCharactersCharacterIdContracts(this.characterId);
+    public async list(page?: number) {
+        return this.api.getCharactersCharacterIdContracts(
+            this.characterId,
+            page,
+        );
     }
 
     public async bids(contractId: number) {

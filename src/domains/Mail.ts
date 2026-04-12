@@ -1,41 +1,44 @@
 import { GeneratedApi } from "../api/GeneratedApi";
 
-export class Mail {
+export class MailMessage {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly characterId: number,
+        readonly id: number,
+    ) {}
+
+    public async update(labels: number[], read: boolean) {
+        return this.api.putCharactersCharacterIdMailMailId(
+            this.characterId,
+            this.id,
+            {
+                labels,
+                read,
+            },
+        );
+    }
+
+    public async delete() {
+        return this.api.deleteCharactersCharacterIdMailMailId(
+            this.characterId,
+            this.id,
+        );
+    }
+}
+
+export class MailLabels {
     constructor(
         readonly api: GeneratedApi,
         readonly characterId: number,
     ) {}
 
-    public async fetch(labels?: number[], lastMailId?: number) {
-        return this.api.getCharactersCharacterIdMail(
-            this.characterId,
-            labels,
-            lastMailId,
-        );
-    }
-
-    public async send(body: {
-        approvedCost?: number;
-        body: string;
-        recipients: Array<{
-            recipientId: number;
-            recipientType:
-                | "alliance"
-                | "character"
-                | "corporation"
-                | "mailing_list";
-        }>;
-        subject: string;
-    }) {
-        return this.api.postCharactersCharacterIdMail(this.characterId, body);
-    }
-
-    public async labels() {
+    public async list() {
         return this.api.getCharactersCharacterIdMailLabels(this.characterId);
     }
 
-    public async createLabel(body: {
-        color?:
+    public async create(
+        name: string,
+        color:
             | "#0000fe"
             | "#006634"
             | "#0099ff"
@@ -53,51 +56,62 @@ export class Mail {
             | "#ff6600"
             | "#ffff01"
             | "#ffffcd"
-            | "#ffffff";
-        name: string;
-    }) {
-        return this.api.postCharactersCharacterIdMailLabels(
-            this.characterId,
-            body,
-        );
+            | "#ffffff",
+    ) {
+        return this.api.postCharactersCharacterIdMailLabels(this.characterId, {
+            name,
+            color,
+        });
     }
 
-    public async deleteLabel(labelId: number) {
+    public async delete(labelId: number) {
         return this.api.deleteCharactersCharacterIdMailLabelsLabelId(
             this.characterId,
             labelId,
         );
+    }
+}
+
+export class Mail {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly characterId: number,
+    ) {}
+
+    public async list(labels?: number[], lastMailId?: number) {
+        return this.api.getCharactersCharacterIdMail(
+            this.characterId,
+            labels,
+            lastMailId,
+        );
+    }
+
+    public async send(
+        subject: string,
+        body: string,
+        recipients: Array<{
+            recipientId: number;
+            recipientType:
+                | "alliance"
+                | "character"
+                | "corporation"
+                | "mailing_list";
+        }>,
+        approvedCost?: number,
+    ) {
+        return this.api.postCharactersCharacterIdMail(this.characterId, {
+            subject,
+            body,
+            recipients,
+            approvedCost,
+        });
     }
 
     public async subscriptions() {
         return this.api.getCharactersCharacterIdMailLists(this.characterId);
     }
 
-    public async delete(mailId: number) {
-        return this.api.deleteCharactersCharacterIdMailMailId(
-            this.characterId,
-            mailId,
-        );
-    }
-
-    public async get(mailId: number) {
-        return this.api.getCharactersCharacterIdMailMailId(
-            this.characterId,
-            mailId,
-        );
-    }
-
-    public async update(
-        mailId: number,
-        body: {
-            labels?: number[];
-            read?: boolean;
-        },
-    ) {
-        this.api.putCharactersCharacterIdMailMailId(
-            this.characterId,
-            mailId,
-            body,
-        );
+    public message(messageId: number) {
+        return new MailMessage(this.api, this.characterId, messageId);
     }
 }

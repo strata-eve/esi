@@ -295,10 +295,10 @@ export class EsiClient implements EsiRequester {
      *
      * @returns A promise that resolves to an array of `PublicAlliance` instances.
      */
-    public async alliances() {
-        const info = await this.api.getAlliances();
-
-        return info.map((id) => new PublicAlliance(this.api, id));
+    public get alliances() {
+        return {
+            list: () => this.api.getAlliances(),
+        };
     }
 
     /**
@@ -309,6 +309,12 @@ export class EsiClient implements EsiRequester {
      */
     public corporation(id: number) {
         return new PublicCorporation(this.api, id);
+    }
+
+    public get corporations() {
+        return {
+            npcs: () => this.api.getCorporationsNpccorps(),
+        };
     }
 
     /**

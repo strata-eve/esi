@@ -6,7 +6,7 @@ export class Fittings {
         readonly characterId: number,
     ) {}
 
-    public async fetch() {
+    public async list() {
         return this.api.getCharactersCharacterIdFittings(this.characterId);
     }
 

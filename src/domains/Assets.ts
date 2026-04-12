@@ -6,8 +6,8 @@ export class CharacterAssets {
         readonly characterId: number,
     ) {}
 
-    public async fetch() {
-        return this.api.getCharactersCharacterIdAssets(this.characterId);
+    public async list(page?: number) {
+        return this.api.getCharactersCharacterIdAssets(this.characterId, page);
     }
 
     public async locations(items: number[]) {

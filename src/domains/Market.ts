@@ -6,14 +6,15 @@ export class CharacterMarket {
         readonly characterId: number,
     ) {}
 
-    public async orders() {
-        return this.api.getCharactersCharacterIdOrders(this.characterId);
-    }
-
-    public async historicalOrders(page?: number) {
-        return this.api.getCharactersCharacterIdOrdersHistory(
-            this.characterId,
-            page,
-        );
+    public get orders() {
+        return {
+            list: () =>
+                this.api.getCharactersCharacterIdOrders(this.characterId),
+            historical: (page?: number) =>
+                this.api.getCharactersCharacterIdOrdersHistory(
+                    this.characterId,
+                    page,
+                ),
+        };
     }
 }

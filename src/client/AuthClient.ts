@@ -1,5 +1,4 @@
 import { GeneratedApi } from "../api/GeneratedApi";
-import { AuthAlliance } from "../domains/Alliance";
 import { AuthCharacter } from "../domains/Character";
 
 export class AuthClient {
@@ -10,9 +9,5 @@ export class AuthClient {
 
     public get character() {
         return new AuthCharacter(this.api, this.actorId);
-    }
-
-    public alliance(id: number) {
-        return new AuthAlliance(this.api, id);
     }
 }

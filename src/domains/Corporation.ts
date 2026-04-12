@@ -10,3 +10,10 @@ export class PublicCorporation {
         return this.api.getCorporationsCorporationId(this.id);
     }
 }
+
+export class AuthCorporation {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly id: number,
+    ) {}
+}
