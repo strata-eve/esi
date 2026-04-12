@@ -26,6 +26,7 @@ interface ParameterSchema {
         format?: string;
     };
     $ref?: string;
+    description?: string;
 }
 
 interface ResponseSchema {
@@ -49,11 +50,13 @@ interface OperationSchema {
                 schema?: SchemaProperty;
             };
         };
+        description?: string;
     };
     "x-rate-limit"?: {
         group?: string;
     };
     security?: Array<Record<string, string[]>>;
+    description?: string;
 }
 
 type PathsDefinition = Record<string, Record<string, OperationSchema>>;
@@ -85,6 +88,32 @@ function toCamelCase(str: string) {
 function toCamelCaseMethod(operationId: string): string {
     if (!operationId) return "unknownMethod";
     return operationId.charAt(0).toLowerCase() + operationId.slice(1);
+}
+
+function generateJSDoc(
+    description?: string,
+    tags?: { tag: string; text: string }[],
+): string {
+    if (!description && (!tags || tags.length === 0)) return "";
+
+    let doc = `/**\n`;
+
+    if (description) {
+        const lines = description.replace(/\r\n/g, "\n").split("\n");
+        for (const line of lines) {
+            doc += ` * ${line.trim()}\n`;
+        }
+    }
+
+    if (tags && tags.length > 0) {
+        if (description) doc += ` *\n`;
+        for (const { tag, text } of tags) {
+            doc += ` * ${tag} ${text}\n`;
+        }
+    }
+
+    doc += ` */`;
+    return doc;
 }
 
 function resolveParamType(schema?: SchemaProperty): string {
@@ -173,6 +202,11 @@ function resolveType(schema?: SchemaProperty): string {
                 const isRequired = requiredFields.includes(key);
                 const camelKey = toCamelCase(key);
 
+                const propDoc = generateJSDoc(val.description);
+                if (propDoc) {
+                    props.push(propDoc);
+                }
+
                 props.push(
                     `   ${camelKey}${isRequired ? "" : "?"}: ${resolveType(val)};`,
                 );
@@ -220,11 +254,12 @@ import { EsiRequester } from "../client/EsiRequester";
 
     for (const [name, schema] of Object.entries(schemas)) {
         const tsType = resolveType(schema);
+        const schemaDoc = generateJSDoc(schema.description);
 
         if (schema.type === "object" && schema.properties) {
-            generatedCode += `export interface ${name} ${tsType}\n\n`;
+            generatedCode += `${schemaDoc}\nexport interface ${name} ${tsType}\n\n`;
         } else {
-            generatedCode += `export type ${name} = ${tsType};\n\n`;
+            generatedCode += `${schemaDoc}\nexport type ${name} = ${tsType};\n\n`;
         }
     }
 
@@ -344,10 +379,38 @@ import { EsiRequester } from "../client/EsiRequester";
             if (rateLimitGroup)
                 requestOptionsArr.push(`rateLimitGroup: '${rateLimitGroup}'`);
 
-            generatedCode += `/**\n`;
-            generatedCode += ` * ${details.summary || ""}\n`;
-            generatedCode += ` * @method ${httpMethod.toUpperCase()} ${pathUrl}\n`;
-            generatedCode += ` */\n`;
+            const authDocText = requiresAuth
+                ? `Yes (${requiredScopes.join(", ")})`
+                : "No (Public)";
+
+            const jsDocTags: { tag: string; text: string }[] = [];
+
+            for (const param of validParams) {
+                const camelName = toCamelCase(param.name!);
+                const paramDesc = param.description
+                    ? `- ${param.description.replace(/\n/g, " ")}`
+                    : "";
+                jsDocTags.push({ tag: `@param ${camelName}`, text: paramDesc });
+            }
+
+            if (hasBody && details.requestBody?.description) {
+                jsDocTags.push({
+                    tag: `@param body`,
+                    text: `- ${details.requestBody.description.replace(/\n/g, " ")}`,
+                });
+            }
+
+            jsDocTags.push({
+                tag: "@method",
+                text: `${httpMethod.toUpperCase()} ${pathUrl}`,
+            });
+            jsDocTags.push({
+                tag: "@remarks",
+                text: `Rate Limit: ${rateLimitGroup || "None"} | Auth Required: ${authDocText}`,
+            });
+            const methodDescription = details.description || details.summary;
+
+            generatedCode += generateJSDoc(methodDescription, jsDocTags) + "\n";
             generatedCode += `public async ${methodName}(${argsString}): Promise<${returnType}> {\n`;
             generatedCode += `    return this.client.request<${returnType}>({\n`;
             generatedCode += requestOptionsArr.join(",\n") + `\n`;
