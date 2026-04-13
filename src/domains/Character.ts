@@ -7,6 +7,7 @@ import { CharacterContract } from "./Contract";
 import { PublicCorporation } from "./Corporation";
 import { Fittings } from "./Fittings";
 import { Fleet } from "./Fleet";
+import { CharacterIndustry } from "./Industry";
 import { Mail } from "./Mail";
 import { CharacterMarket } from "./Market";
 import { Skills } from "./Skills";
@@ -258,6 +259,13 @@ export class AuthCharacter extends PublicCharacter {
      */
     public async implants() {
         return this.api.getCharactersCharacterIdImplants(this.id);
+    }
+
+    /**
+     * Provides access to industry-related operations for this character.
+     */
+    public get industry() {
+        return new CharacterIndustry(this.api, this.id);
     }
 
     /**

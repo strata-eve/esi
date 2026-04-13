@@ -100,4 +100,18 @@ export class CorporationIndustry {
             },
         };
     }
+
+    /**
+     * Retrieves the industry jobs associated with this corporation.
+     *
+     * @param includeCompleted - When `true`, completed jobs are included in the results
+     * in addition to active ones. Defaults to `false` if omitted.
+     * @returns A promise resolving to an array of industry job records.
+     */
+    public async jobs(includeCompleted?: boolean) {
+        return this.api.getCorporationsCorporationIdIndustryJobs(
+            this.corporationId,
+            includeCompleted,
+        );
+    }
 }

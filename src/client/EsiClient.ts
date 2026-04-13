@@ -332,4 +332,25 @@ export class EsiClient implements EsiRequester {
     public async contracts(regionId: number, page?: number) {
         return this.api.getContractsPublicRegionId(regionId, page);
     }
+
+    public get dogma() {
+        return {
+            attributes: {
+                list: () => this.api.getDogmaAttributes(),
+            },
+            attribute: (id: number) => ({
+                fetch: () => this.api.getDogmaAttributesAttributeId(id),
+            }),
+            effects: {
+                list: () => this.api.getDogmaEffects(),
+            },
+            effect: (id: number) => ({
+                fetch: () => this.api.getDogmaEffectsEffectId(id),
+            }),
+            dynamicItem: (typeId: number, itemId: number) => ({
+                fetch: () =>
+                    this.api.getDogmaDynamicItemsTypeIdItemId(itemId, typeId),
+            }),
+        };
+    }
 }

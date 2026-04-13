@@ -68,3 +68,39 @@ export class CharacterContract {
         );
     }
 }
+
+/**
+ * Represents a contract associated with a specific corporation,
+ * providing access to its bids and items.
+ */
+export class CorporationContract {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly corpId: number,
+        readonly id: number,
+    ) {}
+
+    /**
+     * Retrieves all bids placed on this contract.
+     *
+     * @returns A promise resolving to an array of bid records.
+     */
+    public async bids() {
+        return this.api.getCorporationsCorporationIdContractsContractIdBids(
+            this.corpId,
+            this.id,
+        );
+    }
+
+    /**
+     * Retrieves all items included in this contract.
+     *
+     * @returns A promise resolving to an array of item records.
+     */
+    public async items() {
+        return this.api.getCorporationsCorporationIdContractsContractIdItems(
+            this.corpId,
+            this.id,
+        );
+    }
+}
