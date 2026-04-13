@@ -15,7 +15,7 @@ import {
     PublicCorporation,
     PublicContract,
 } from "../domains";
-import { PublicUniverse } from "../domains/Universe";
+import { PublicUniverse } from "../domains/universe/Universe";
 
 /**
  * Configuration object for the HTTP User-Agent header.
@@ -388,6 +388,18 @@ export class EsiClient implements EsiRequester {
 
     public status() {
         return this.api.getStatus();
+    }
+
+    public async wars() {
+        return this.api.getWars();
+    }
+
+    public war(id: number) {
+        return {
+            fetch: () => this.api.getWarsWarId(id),
+            killmails: (page?: number) =>
+                this.api.getWarsWarIdKillmails(id, page),
+        };
     }
 
     public get fw() {

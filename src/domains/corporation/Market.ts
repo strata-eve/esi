@@ -1,0 +1,39 @@
+import { GeneratedApi } from "../../api/GeneratedApi";
+
+/**
+ * Provides access to market-related operations scoped to a specific corporation.
+ */
+export class CorporationMarket {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly corpId: number,
+    ) {}
+
+    /**
+     * Provides access to market order operations for this corporation.
+     */
+    public get orders() {
+        return {
+            /**
+             * Retrieves all active market orders placed by this corporation.
+             *
+             * @returns A promise resolving to an array of order records, each containing
+             * the order ID, type ID, location ID, volume, price, side, and timestamps.
+             */
+            list: () =>
+                this.api.getCorporationsCorporationIdOrders(this.corpId),
+
+            /**
+             * Retrieves a paginated history of market orders previously placed by this corporation.
+             *
+             * @param page - The page of results to retrieve. Defaults to the first page if omitted.
+             * @returns A promise resolving to an array of historical order records.
+             */
+            history: (page?: number) =>
+                this.api.getCorporationsCorporationIdOrdersHistory(
+                    this.corpId,
+                    page,
+                ),
+        };
+    }
+}

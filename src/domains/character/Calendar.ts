@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
 /**
  * Represents a single calendar event scoped to a specific character,
@@ -10,6 +10,20 @@ export class CalendarEvent {
         readonly characterId: number,
         readonly eventId: number,
     ) {}
+
+    /**
+     * Retrieves the list of characters who have been invited to this event
+     * along with their individual responses.
+     *
+     * @returns A promise resolving to an array of attendee objects, each containing
+     * a character ID and their response status.
+     */
+    public async attendees() {
+        return this.api.getCharactersCharacterIdCalendarEventIdAttendees(
+            this.characterId,
+            this.eventId,
+        );
+    }
 
     /**
      * Retrieves the full details of this calendar event.
@@ -39,20 +53,6 @@ export class CalendarEvent {
             },
         );
     }
-
-    /**
-     * Retrieves the list of characters who have been invited to this event
-     * along with their individual responses.
-     *
-     * @returns A promise resolving to an array of attendee objects, each containing
-     * a character ID and their response status.
-     */
-    public async attendees() {
-        return this.api.getCharactersCharacterIdCalendarEventIdAttendees(
-            this.characterId,
-            this.eventId,
-        );
-    }
 }
 
 /**
@@ -66,6 +66,17 @@ export class Calendar {
     ) {}
 
     /**
+     * Returns a {@link CalendarEvent} instance scoped to the specified event,
+     * enabling access to its details, attendees, and response management.
+     *
+     * @param eventId - The unique identifier of the calendar event.
+     * @returns A {@link CalendarEvent} instance scoped to the given event ID.
+     */
+    public event(eventId: number) {
+        return new CalendarEvent(this.api, this.characterId, eventId);
+    }
+
+    /**
      * Retrieves a list of the character's upcoming calendar events.
      *
      * @param fromEvent - An optional event ID to use as the starting point for
@@ -77,16 +88,5 @@ export class Calendar {
             this.characterId,
             fromEvent,
         );
-    }
-
-    /**
-     * Returns a {@link CalendarEvent} instance scoped to the specified event,
-     * enabling access to its details, attendees, and response management.
-     *
-     * @param eventId - The unique identifier of the calendar event.
-     * @returns A {@link CalendarEvent} instance scoped to the given event ID.
-     */
-    public event(eventId: number) {
-        return new CalendarEvent(this.api, this.characterId, eventId);
     }
 }

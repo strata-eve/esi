@@ -1,10 +1,10 @@
-import { GeneratedApi } from "../api/GeneratedApi";
-import { AuthAlliance, PublicAlliance } from "./Alliance";
+import { GeneratedApi } from "../../api/GeneratedApi";
+import { AuthAlliance, PublicAlliance } from "../alliance/Alliance";
 import { CharacterAssets } from "./Assets";
 import { Calendar } from "./Calendar";
 import { CharacterColonies } from "./Colony";
-import { CharacterContract } from "./Contract";
-import { PublicCorporation } from "./Corporation";
+import { CharacterContract, CharacterContracts } from "./Contract";
+import { AuthCorporation, PublicCorporation } from "../corporation/Corporation";
 import { Fittings } from "./Fittings";
 import { Fleet } from "./Fleet";
 import { CharacterIndustry } from "./Industry";
@@ -12,14 +12,7 @@ import { Mail } from "./Mail";
 import { CharacterMarket } from "./Market";
 import { Skills } from "./Skills";
 import { CharacterWallet } from "./Wallet";
-
-export interface NewMailData {
-    body: string;
-    recipients: number[];
-    subject: string;
-    toCorpOrAllianceId?: number;
-    toMailingListId?: number;
-}
+import { CharacterUi } from "./Ui";
 
 /**
  * Represents a publicly accessible EVE Online character entity.
@@ -32,26 +25,6 @@ export class PublicCharacter {
         readonly api: GeneratedApi,
         readonly id: number,
     ) {}
-
-    /**
-     * Retrieves public information about this character.
-     *
-     * @returns A promise resolving to the character's public profile data,
-     * including their name, corporation, alliance, birthday, and security status.
-     */
-    public async fetch() {
-        return this.api.getCharactersCharacterId(this.id);
-    }
-
-    /**
-     * Retrieves the portrait image URLs for this character.
-     *
-     * @returns A promise resolving to an object containing URLs for the
-     * character's portrait at various sizes.
-     */
-    public async portrait() {
-        return this.api.getCharactersCharacterIdPortrait(this.id);
-    }
 
     /**
      * Retrieves the alliance this character is currently a member of, if any.
@@ -81,15 +54,28 @@ export class PublicCharacter {
         return new PublicCorporation(this.api, info.corporationId);
     }
 
+    public get corporationHistory() {
+        return new CharacterCorporationHistory(this.api, this.id);
+    }
+
     /**
-     * Retrieves the full corporation membership history of this character.
+     * Retrieves public information about this character.
      *
-     * @returns A promise resolving to an array of historical corporation membership
-     * records, each containing a corporation ID, record ID, start date, and
-     * an optional deletion flag.
+     * @returns A promise resolving to the character's public profile data,
+     * including their name, corporation, alliance, birthday, and security status.
      */
-    public async corporationHistory() {
-        return this.api.getCharactersCharacterIdCorporationhistory(this.id);
+    public async fetch() {
+        return this.api.getCharactersCharacterId(this.id);
+    }
+
+    /**
+     * Retrieves the portrait image URLs for this character.
+     *
+     * @returns A promise resolving to an object containing URLs for the
+     * character's portrait at various sizes.
+     */
+    public async portrait() {
+        return this.api.getCharactersCharacterIdPortrait(this.id);
     }
 }
 
@@ -116,14 +102,8 @@ export class AuthCharacter extends PublicCharacter {
         return new AuthAlliance(this.api, info.allianceId);
     }
 
-    /**
-     * Retrieves the list of NPC agents this character is currently researching with.
-     *
-     * @returns A promise resolving to an array of agent research records, each
-     * containing the agent ID, skill type ID, and research progress points.
-     */
-    public async agentsResearch() {
-        return this.api.getCharactersCharacterIdAgentsResearch(this.id);
+    public get agentsResearch() {
+        return new CharacterAgentsResearch(this.api, this.id);
     }
 
     /**
@@ -136,15 +116,6 @@ export class AuthCharacter extends PublicCharacter {
     }
 
     /**
-     * Retrieves the list of blueprints owned by this character.
-     *
-     * @returns A promise resolving to an array of blueprint records.
-     */
-    public async blueprints() {
-        return this.api.getCharactersCharacterIdBlueprints(this.id);
-    }
-
-    /**
      * Provides access to calendar-related operations for this character.
      *
      * @returns A {@link Calendar} instance scoped to this character.
@@ -153,14 +124,17 @@ export class AuthCharacter extends PublicCharacter {
         return new Calendar(this.api, this.id);
     }
 
+    public get clones() {
+        return new CharacterClones(this.api, this.id);
+    }
+
     /**
-     * Retrieves the clone and jump clone information for this character.
+     * Provides access to planetary colony operations for this character.
      *
-     * @returns A promise resolving to an object containing the character's
-     * home location, jump clones, and last clone jump date, etc.
+     * @returns A {@link CharacterColonies} instance scoped to this character.
      */
-    public async clones() {
-        return this.api.getCharactersCharacterIdClones(this.id);
+    public get colonies() {
+        return new CharacterColonies(this.api, this.id);
     }
 
     /**
@@ -175,19 +149,16 @@ export class AuthCharacter extends PublicCharacter {
     }
 
     /**
-     * Provides access to contract collection operations for this character.
+     * Retrieves the recent contact notifications received by this character.
+     *
+     * @returns A promise resolving to an array of contact notification records.
      */
+    public async contactNotifications() {
+        return this.api.getCharactersCharacterIdNotificationsContacts(this.id);
+    }
+
     public get contracts() {
-        return {
-            /**
-             * Retrieves a paginated list of contracts associated with this character.
-             *
-             * @param page - The page of results to retrieve. Defaults to the first page if omitted.
-             * @returns A promise resolving to an array of contract records.
-             */
-            list: (page?: number) =>
-                this.api.getCharactersCharacterIdContracts(this.id, page),
-        };
+        return new CharacterContracts(this.api, this.id);
     }
 
     /**
@@ -201,7 +172,7 @@ export class AuthCharacter extends PublicCharacter {
 
         if (!info.corporationId) return null;
 
-        return new PublicCorporation(this.api, info.corporationId);
+        return new AuthCorporation(this.api, info.corporationId);
     }
 
     /**
@@ -260,19 +231,11 @@ export class AuthCharacter extends PublicCharacter {
     }
 
     public get fw() {
-        return {
-            stats: () => this.api.getCharactersCharacterIdFwStats(this.id),
-        };
+        return new CharacterFw(this.api, this.id);
     }
 
-    /**
-     * Retrieves the list of implants currently installed in this character's
-     * active clone.
-     *
-     * @returns A promise resolving to an array of implant type IDs.
-     */
-    public async implants() {
-        return this.api.getCharactersCharacterIdImplants(this.id);
+    public get implants() {
+        return new CharacterImplants(this.api, this.id);
     }
 
     /**
@@ -282,25 +245,12 @@ export class AuthCharacter extends PublicCharacter {
         return new CharacterIndustry(this.api, this.id);
     }
 
-    /**
-     * Retrieves the most recent killmails involving this character.
-     *
-     * @param page - The page of results to retrieve. Defaults to the first page if omitted.
-     * @returns A promise resolving to an array of killmail references, each
-     * containing a killmail ID and its corresponding hash.
-     */
-    public async killmails(page?: number) {
-        return this.api.getCharactersCharacterIdKillmailsRecent(this.id, page);
+    public get killmails() {
+        return new CharacterKillmails(this.api, this.id);
     }
 
-    /**
-     * Retrieves the current location of this character within the EVE universe.
-     *
-     * @returns A promise resolving to an object containing the solar system ID,
-     * and optionally the station ID or structure ID the character is currently docked at.
-     */
-    public async location() {
-        return this.api.getCharactersCharacterIdLocation(this.id);
+    public get location() {
+        return new CharacterLocation(this.api, this.id);
     }
 
     /**
@@ -323,30 +273,20 @@ export class AuthCharacter extends PublicCharacter {
     }
 
     /**
-     * Retrieves the medals awarded to this character.
+     * Provides access to market-related operations for this character.
      *
-     * @returns A promise resolving to an array of medal records.
+     * @returns A {@link CharacterMarket} instance scoped to this character.
      */
-    public async medals() {
-        return this.api.getCharactersCharacterIdMedals(this.id);
+    public get market() {
+        return new CharacterMarket(this.api, this.id);
     }
 
-    /**
-     * Retrieves the recent notifications received by this character.
-     *
-     * @returns A promise resolving to an array of notification records.
-     */
-    public async notifications() {
-        return this.api.getCharactersCharacterIdNotifications(this.id);
+    public get medals() {
+        return new CharacterMedals(this.api, this.id);
     }
 
-    /**
-     * Retrieves the recent contact notifications received by this character.
-     *
-     * @returns A promise resolving to an array of contact notification records.
-     */
-    public async contactNotifications() {
-        return this.api.getCharactersCharacterIdNotificationsContacts(this.id);
+    public get notifications() {
+        return new CharacterNotifications(this.api, this.id);
     }
 
     /**
@@ -359,32 +299,8 @@ export class AuthCharacter extends PublicCharacter {
         return this.api.getCharactersCharacterIdOnline(this.id);
     }
 
-    /**
-     * Provides access to market-related operations for this character.
-     *
-     * @returns A {@link CharacterMarket} instance scoped to this character.
-     */
-    public get market() {
-        return new CharacterMarket(this.api, this.id);
-    }
-
-    /**
-     * Provides access to planetary colony operations for this character.
-     *
-     * @returns A {@link CharacterColonies} instance scoped to this character.
-     */
-    public get colonies() {
-        return new CharacterColonies(this.api, this.id);
-    }
-
-    /**
-     * Retrieves the corporation roles assigned to this character.
-     *
-     * @returns A promise resolving to an object containing the character's
-     * roles.
-     */
     public get roles() {
-        return this.api.getCharactersCharacterIdRoles(this.id);
+        return new CharacterRoles(this.api, this.id);
     }
 
     /**
@@ -422,14 +338,8 @@ export class AuthCharacter extends PublicCharacter {
         );
     }
 
-    /**
-     * Retrieves information about the ship this character is currently piloting.
-     *
-     * @returns A promise resolving to an object containing the ship's item ID,
-     * type ID, and in-game name.
-     */
-    public async ship() {
-        return this.api.getCharactersCharacterIdShip(this.id);
+    public get ship() {
+        return new CharacterShip(this.api, this.id);
     }
 
     /**
@@ -441,25 +351,16 @@ export class AuthCharacter extends PublicCharacter {
         return new Skills(this.api, this.id);
     }
 
-    /**
-     * Retrieves the standings this character has with other entities,
-     * such as agents, NPC corporations, and factions.
-     *
-     * @returns A promise resolving to an array of standing records, each
-     * containing the entity type, entity ID, and standing value.
-     */
-    public async standings() {
-        return this.api.getCharactersCharacterIdStandings(this.id);
+    public get standings() {
+        return new CharacterStandings(this.api, this.id);
     }
 
-    /**
-     * Retrieves the corporation titles held by this character.
-     *
-     * @returns A promise resolving to an array of title records, each
-     * containing a title ID and its in-game name.
-     */
-    public async titles() {
-        return this.api.getCharactersCharacterIdTitles(this.id);
+    public get titles() {
+        return new CharacterTitles(this.api, this.id);
+    }
+
+    public get ui() {
+        return new CharacterUi(this.api, this.id);
     }
 
     /**
@@ -470,36 +371,167 @@ export class AuthCharacter extends PublicCharacter {
     public get wallet() {
         return new CharacterWallet(this.api, this.id);
     }
+}
 
-    public get ui() {
-        return {
-            autopilot: {
-                waypoints: {
-                    add: (
-                        destinationId: number,
-                        options?: {
-                            addToBeginning: boolean;
-                            clearOtherWaypoints?: boolean;
-                        },
-                    ) =>
-                        this.api.postUiAutopilotWaypoint(
-                            options?.addToBeginning ?? false,
-                            options?.clearOtherWaypoints ?? false,
-                            destinationId,
-                        ),
-                },
-            },
+export class CharacterCorporationHistory {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
 
-            open: {
-                contract: (contractId: number) =>
-                    this.api.postUiOpenwindowContract(contractId),
-                information: (targetId: number) =>
-                    this.api.postUiOpenwindowInformation(targetId),
-                marketDetails: (typeId: number) =>
-                    this.api.postUiOpenwindowMarketdetails(typeId),
-                newMail: (data: NewMailData) =>
-                    this.api.postUiOpenwindowNewmail(data),
-            },
-        };
+    public async list() {
+        return this.api.getCharactersCharacterIdCorporationhistory(this.charId);
+    }
+}
+
+export class CharacterAgentsResearch {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdAgentsResearch(this.charId);
+    }
+}
+
+export class CharacterClones {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdClones(this.charId);
+    }
+}
+
+export class CharacterFw {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async stats() {
+        return this.api.getCharactersCharacterIdFwStats(this.charId);
+    }
+}
+
+export class CharacterLocation {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async fetch() {
+        return this.api.getCharactersCharacterIdLocation(this.charId);
+    }
+}
+
+export class CharacterImplants {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdImplants(this.charId);
+    }
+}
+
+export class CharacterKillmails {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async recent(page?: number) {
+        return this.api.getCharactersCharacterIdKillmailsRecent(
+            this.charId,
+            page,
+        );
+    }
+}
+
+export class CharacterMedals {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdMedals(this.charId);
+    }
+}
+
+export class CharacterContactNotifications {
+    constructor(
+        private readonly api: GeneratedApi,
+        private readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdNotificationsContacts(
+            this.charId,
+        );
+    }
+}
+
+export class CharacterNotifications {
+    constructor(
+        readonly api: GeneratedApi,
+        readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdNotifications(this.charId);
+    }
+
+    public get contacts() {
+        return new CharacterContactNotifications(this.api, this.charId);
+    }
+}
+
+export class CharacterRoles {
+    constructor(
+        private readonly api: GeneratedApi,
+        private readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdRoles(this.charId);
+    }
+}
+
+export class CharacterShip {
+    constructor(
+        private readonly api: GeneratedApi,
+        private readonly charId: number,
+    ) {}
+
+    public async fetch() {
+        return this.api.getCharactersCharacterIdShip(this.charId);
+    }
+}
+
+export class CharacterStandings {
+    constructor(
+        private readonly api: GeneratedApi,
+        private readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdStandings(this.charId);
+    }
+}
+
+export class CharacterTitles {
+    constructor(
+        private readonly api: GeneratedApi,
+        private readonly charId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getCharactersCharacterIdTitles(this.charId);
     }
 }

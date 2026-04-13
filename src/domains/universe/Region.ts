@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
 export type OrderType = "buy" | "sell" | "all";
 

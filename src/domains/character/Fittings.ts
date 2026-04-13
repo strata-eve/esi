@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
 /** Represents a valid module slot flag for a ship fitting. */
 export type FittingFlag =
@@ -79,16 +79,6 @@ export class Fittings {
     ) {}
 
     /**
-     * Retrieves all ship fittings saved by this character.
-     *
-     * @returns A promise resolving to an array of fitting records, each containing
-     * a fitting ID, name, description, ship type ID, and the list of fitted modules.
-     */
-    public async list() {
-        return this.api.getCharactersCharacterIdFittings(this.characterId);
-    }
-
-    /**
      * Saves a new ship fitting for this character.
      *
      * @param data - The fitting details including name, description, ship type and modules.
@@ -99,6 +89,16 @@ export class Fittings {
             this.characterId,
             data,
         );
+    }
+
+    /**
+     * Retrieves all ship fittings saved by this character.
+     *
+     * @returns A promise resolving to an array of fitting records, each containing
+     * a fitting ID, name, description, ship type ID, and the list of fitted modules.
+     */
+    public async list() {
+        return this.api.getCharactersCharacterIdFittings(this.characterId);
     }
 
     /**

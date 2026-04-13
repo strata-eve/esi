@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
 /**
  * Provides access to planetary colony operations scoped to a specific character.
@@ -8,15 +8,6 @@ export class CharacterColonies {
         readonly api: GeneratedApi,
         readonly characterId: number,
     ) {}
-
-    /**
-     * Retrieves all planetary colonies owned by this character.
-     *
-     * @returns A promise resolving to an array of colony records.
-     */
-    public async list() {
-        return this.api.getCharactersCharacterIdPlanets(this.characterId);
-    }
 
     /**
      * Returns a scoped accessor for a specific planetary colony,
@@ -37,5 +28,14 @@ export class CharacterColonies {
                     colonyId,
                 ),
         };
+    }
+
+    /**
+     * Retrieves all planetary colonies owned by this character.
+     *
+     * @returns A promise resolving to an array of colony records.
+     */
+    public async list() {
+        return this.api.getCharactersCharacterIdPlanets(this.characterId);
     }
 }

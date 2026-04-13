@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
 /** A valid label color value supported by the EVE Online mail system. */
 export type MailLabelColor =

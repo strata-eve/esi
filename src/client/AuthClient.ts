@@ -1,5 +1,5 @@
 import { GeneratedApi } from "../api/GeneratedApi";
-import { AuthCharacter } from "../domains/Character";
+import { AuthCharacter } from "../domains/character/Character";
 
 export class AuthClient {
     constructor(

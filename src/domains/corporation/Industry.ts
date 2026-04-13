@@ -1,38 +1,13 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
-/**
- * Provides access to industry-related operations scoped to a specific character,
- * including job tracking and mining ledger access.
- */
-export class CharacterIndustry {
+export class CorporationBlueprints {
     constructor(
         readonly api: GeneratedApi,
-        readonly characterId: number,
+        readonly id: number,
     ) {}
 
-    /**
-     * Retrieves the industry jobs associated with this character.
-     *
-     * @param includeCompleted - When `true`, completed jobs are included in the results
-     * in addition to active ones. Defaults to `false` if omitted.
-     * @returns A promise resolving to an array of industry job records.
-     */
-    public async jobs(includeCompleted?: boolean) {
-        return this.api.getCharactersCharacterIdIndustryJobs(
-            this.characterId,
-            includeCompleted,
-        );
-    }
-
-    /**
-     * Retrieves a paginated mining ledger for this character,
-     * detailing all ore mined within the past 30 days.
-     *
-     * @param page - The page of results to retrieve. Defaults to the first page if omitted.
-     * @returns A promise resolving to an array of mining records.
-     */
-    public async mining(page?: number) {
-        return this.api.getCharactersCharacterIdMining(this.characterId, page);
+    public async list(page?: number) {
+        return this.api.getCorporationsCorporationIdBlueprints(this.id, page);
     }
 }
 
@@ -48,6 +23,10 @@ export class CorporationIndustry {
         readonly api: GeneratedApi,
         readonly corporationId: number,
     ) {}
+
+    public get blueprints() {
+        return new CorporationBlueprints(this.api, this.corporationId);
+    }
 
     /**
      * Retrieves a paginated list of active moon chunk extraction timers for this corporation.

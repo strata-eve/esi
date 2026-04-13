@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 
 /** The data that can be updated on an existing fleet. */
 export interface UpdateFleetData {

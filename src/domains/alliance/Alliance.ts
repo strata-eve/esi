@@ -1,4 +1,4 @@
-import { GeneratedApi } from "../api/GeneratedApi";
+import { GeneratedApi } from "../../api/GeneratedApi";
 import { AllianceContacts } from "./Contacts";
 
 /**
@@ -14,22 +14,17 @@ export class PublicAlliance {
     ) {}
 
     /**
+     * Provides access to corporation-related operations within this alliance.
+     */
+    public get corporations() {
+        return new AllianceCorporations(this.api, this.id);
+    }
+
+    /**
      * Retrieves public information about alliance.
      */
     public async fetch() {
         return this.api.getAlliancesAllianceId(this.id);
-    }
-
-    /**
-     * Provides access to corporation-related operations within this alliance.
-     */
-    public get corporations() {
-        return {
-            /**
-             * Retrieves all corporations currently members of this alliance.
-             */
-            list: () => this.api.getAlliancesAllianceIdCorporations(this.id),
-        };
     }
 
     /**
@@ -54,5 +49,16 @@ export class AuthAlliance extends PublicAlliance {
      */
     public get contacts() {
         return new AllianceContacts(this.api, this.id);
+    }
+}
+
+export class AllianceCorporations {
+    constructor(
+        private readonly api: GeneratedApi,
+        private readonly allianceId: number,
+    ) {}
+
+    public async list() {
+        return this.api.getAlliancesAllianceIdCorporations(this.allianceId);
     }
 }
