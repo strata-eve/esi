@@ -10,7 +10,7 @@ export class CharacterMarket {
         return {
             list: () =>
                 this.api.getCharactersCharacterIdOrders(this.characterId),
-            historical: (page?: number) =>
+            history: (page?: number) =>
                 this.api.getCharactersCharacterIdOrdersHistory(
                     this.characterId,
                     page,

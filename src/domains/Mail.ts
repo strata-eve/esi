@@ -7,6 +7,13 @@ export class MailMessage {
         readonly id: number,
     ) {}
 
+    public async fetch() {
+        return this.api.getCharactersCharacterIdMailMailId(
+            this.characterId,
+            this.id,
+        );
+    }
+
     public async update(labels: number[], read: boolean) {
         return this.api.putCharactersCharacterIdMailMailId(
             this.characterId,

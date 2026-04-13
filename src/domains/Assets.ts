@@ -31,8 +31,11 @@ export class CorporationAssets {
         readonly corporationId: number,
     ) {}
 
-    public async fetch() {
-        return this.api.getCorporationsCorporationIdAssets(this.corporationId);
+    public async list(page?: number) {
+        return this.api.getCorporationsCorporationIdAssets(
+            this.corporationId,
+            page,
+        );
     }
 
     public async locations(items: number[]) {

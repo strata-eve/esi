@@ -3,6 +3,7 @@ import { AuthAlliance, PublicAlliance } from "./Alliance";
 import { CharacterAssets } from "./Assets";
 import { Calendar } from "./Calendar";
 import { CharacterColonies } from "./Colony";
+import { CharacterContract } from "./Contract";
 import { PublicCorporation } from "./Corporation";
 import { Fittings } from "./Fittings";
 import { Fleet } from "./Fleet";
@@ -42,21 +43,7 @@ export class PublicCharacter {
     }
 
     public async corporationHistory() {
-        const info = await this.api.getCharactersCharacterIdCorporationhistory(
-            this.id,
-        );
-
-        return info.map((record) => {
-            return {
-                corporation: new PublicCorporation(
-                    this.api,
-                    record.corporationId,
-                ),
-                isDeleted: record.isDeleted,
-                recordId: record.recordId,
-                startDate: record.startDate,
-            };
-        });
+        return this.api.getCharactersCharacterIdCorporationhistory(this.id);
     }
 }
 
@@ -91,6 +78,17 @@ export class AuthCharacter extends PublicCharacter {
 
     public async clones() {
         return this.api.getCharactersCharacterIdClones(this.id);
+    }
+
+    public contract(contractId: number) {
+        return new CharacterContract(this.api, this.id, contractId);
+    }
+
+    public get contracts() {
+        return {
+            list: (page?: number) =>
+                this.api.getCharactersCharacterIdContracts(this.id, page),
+        };
     }
 
     public async corporation() {
