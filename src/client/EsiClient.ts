@@ -15,7 +15,7 @@ import {
     PublicCorporation,
     PublicContract,
 } from "../domains";
-import { Region } from "../domains/Region";
+import { PublicUniverse } from "../domains/Universe";
 
 /**
  * Configuration object for the HTTP User-Agent header.
@@ -327,11 +327,8 @@ export class EsiClient implements EsiRequester {
         return new PublicContract(this.api, id);
     }
 
-    /**
-     * Retrieves paginated list of all public contracts in the given region
-     */
-    public region(regionId: number) {
-        return new Region(this.api, regionId);
+    public get universe() {
+        return new PublicUniverse(this.api);
     }
 
     public route(origin: number, destination: number) {
@@ -350,6 +347,13 @@ export class EsiClient implements EsiRequester {
                     options.connections,
                     options.flag,
                 ),
+        };
+    }
+
+    public get meta() {
+        return {
+            changelog: () => this.api.getMetaChangelog(),
+            compatibilityDates: () => this.api.getMetaCompatibilityDates(),
         };
     }
 
