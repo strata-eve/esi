@@ -334,6 +334,33 @@ export class EsiClient implements EsiRequester {
         return new Region(this.api, regionId);
     }
 
+    public route(origin: number, destination: number) {
+        return {
+            fetch: (
+                options: {
+                    avoid?: number[];
+                    connections?: number[][];
+                    flag?: "shortest" | "secure" | "insecure";
+                } = {},
+            ) =>
+                this.api.getRouteOriginDestination(
+                    destination,
+                    origin,
+                    options.avoid,
+                    options.connections,
+                    options.flag,
+                ),
+        };
+    }
+
+    public get sovereignty() {
+        return {
+            campaigns: () => this.api.getSovereigntyCampaigns(),
+            map: () => this.api.getSovereigntyMap(),
+            structures: () => this.api.getSovereigntyStructures(),
+        };
+    }
+
     public get dogma() {
         return {
             attributes: {
@@ -353,6 +380,10 @@ export class EsiClient implements EsiRequester {
                     this.api.getDogmaDynamicItemsTypeIdItemId(itemId, typeId),
             }),
         };
+    }
+
+    public status() {
+        return this.api.getStatus();
     }
 
     public get fw() {

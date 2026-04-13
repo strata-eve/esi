@@ -13,6 +13,14 @@ import { CharacterMarket } from "./Market";
 import { Skills } from "./Skills";
 import { CharacterWallet } from "./Wallet";
 
+export interface NewMailData {
+    body: string;
+    recipients: number[];
+    subject: string;
+    toCorpOrAllianceId?: number;
+    toMailingListId?: number;
+}
+
 /**
  * Represents a publicly accessible EVE Online character entity.
  *
@@ -461,5 +469,37 @@ export class AuthCharacter extends PublicCharacter {
      */
     public get wallet() {
         return new CharacterWallet(this.api, this.id);
+    }
+
+    public get ui() {
+        return {
+            autopilot: {
+                waypoints: {
+                    add: (
+                        destinationId: number,
+                        options?: {
+                            addToBeginning: boolean;
+                            clearOtherWaypoints?: boolean;
+                        },
+                    ) =>
+                        this.api.postUiAutopilotWaypoint(
+                            options?.addToBeginning ?? false,
+                            options?.clearOtherWaypoints ?? false,
+                            destinationId,
+                        ),
+                },
+            },
+
+            open: {
+                contract: (contractId: number) =>
+                    this.api.postUiOpenwindowContract(contractId),
+                information: (targetId: number) =>
+                    this.api.postUiOpenwindowInformation(targetId),
+                marketDetails: (typeId: number) =>
+                    this.api.postUiOpenwindowMarketdetails(typeId),
+                newMail: (data: NewMailData) =>
+                    this.api.postUiOpenwindowNewmail(data),
+            },
+        };
     }
 }
