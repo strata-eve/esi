@@ -15,6 +15,7 @@ import {
     PublicCorporation,
     PublicContract,
 } from "../domains";
+import { Region } from "../domains/Region";
 
 /**
  * Configuration object for the HTTP User-Agent header.
@@ -329,8 +330,8 @@ export class EsiClient implements EsiRequester {
     /**
      * Retrieves paginated list of all public contracts in the given region
      */
-    public async contracts(regionId: number, page?: number) {
-        return this.api.getContractsPublicRegionId(regionId, page);
+    public region(regionId: number) {
+        return new Region(this.api, regionId);
     }
 
     public get dogma() {
@@ -363,6 +364,41 @@ export class EsiClient implements EsiRequester {
             stats: () => this.api.getFwStats(),
             systems: () => this.api.getFwSystems(),
             wars: () => this.api.getFwWars(),
+        };
+    }
+
+    public async incursions() {
+        return this.api.getIncursions();
+    }
+
+    public get industry() {
+        return {
+            facilities: () => this.api.getIndustryFacilities(),
+            systems: () => this.api.getIndustrySystems(),
+        };
+    }
+
+    public get insurance() {
+        return {
+            prices: () => this.api.getInsurancePrices(),
+        };
+    }
+
+    public killmail(id: number, hash: string) {
+        return {
+            fetch: () => this.api.getKillmailsKillmailIdKillmailHash(hash, id),
+        };
+    }
+
+    public get market() {
+        return {
+            groups: {
+                list: () => this.api.getMarketsGroups(),
+            },
+            group: (id: number) => ({
+                fetch: () => this.api.getMarketsGroupsMarketGroupId(id),
+            }),
+            prices: () => this.api.getMarketsPrices(),
         };
     }
 }

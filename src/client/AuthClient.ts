@@ -10,4 +10,13 @@ export class AuthClient {
     public get character() {
         return new AuthCharacter(this.api, this.actorId);
     }
+
+    public structure(structureId: number) {
+        return {
+            market: {
+                orders: (page?: number) =>
+                    this.api.getMarketsStructuresStructureId(structureId, page),
+            },
+        };
+    }
 }

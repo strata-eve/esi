@@ -21,6 +21,10 @@ export class PublicCorporation {
     public async allianceHistory() {
         return this.api.getCorporationsCorporationIdAlliancehistory(this.id);
     }
+
+    public async loyaltyOffers() {
+        return this.api.getLoyaltyStoresCorporationIdOffers(this.id);
+    }
 }
 
 export class AuthCorporation {
