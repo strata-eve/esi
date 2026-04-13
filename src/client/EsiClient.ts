@@ -353,4 +353,16 @@ export class EsiClient implements EsiRequester {
             }),
         };
     }
+
+    public get fw() {
+        return {
+            leaderboads: {
+                characters: () => this.api.getFwLeaderboardsCharacters(),
+                corporations: () => this.api.getFwLeaderboardsCorporations(),
+            },
+            stats: () => this.api.getFwStats(),
+            systems: () => this.api.getFwSystems(),
+            wars: () => this.api.getFwWars(),
+        };
+    }
 }

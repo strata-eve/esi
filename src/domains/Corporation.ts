@@ -75,6 +75,12 @@ export class AuthCorporation {
         return this.api.getCorporationsCorporationIdFacilities(this.id);
     }
 
+    public get fw() {
+        return {
+            stats: () => this.api.getCorporationsCorporationIdFwStats(this.id),
+        };
+    }
+
     public async icons() {
         return this.api.getCorporationsCorporationIdIcons(this.id);
     }

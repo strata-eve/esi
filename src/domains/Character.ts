@@ -11,7 +11,7 @@ import { CharacterIndustry } from "./Industry";
 import { Mail } from "./Mail";
 import { CharacterMarket } from "./Market";
 import { Skills } from "./Skills";
-import { Wallet } from "./Wallet";
+import { CharacterWallet } from "./Wallet";
 
 /**
  * Represents a publicly accessible EVE Online character entity.
@@ -251,6 +251,12 @@ export class AuthCharacter extends PublicCharacter {
         return this.api.getCharactersCharacterIdFleet(this.id);
     }
 
+    public get fw() {
+        return {
+            stats: () => this.api.getCharactersCharacterIdFwStats(this.id),
+        };
+    }
+
     /**
      * Retrieves the list of implants currently installed in this character's
      * active clone.
@@ -451,9 +457,9 @@ export class AuthCharacter extends PublicCharacter {
     /**
      * Provides access to wallet-related operations for this character.
      *
-     * @returns A {@link Wallet} instance scoped to this character.
+     * @returns A {@link CharacterWallet} instance scoped to this character.
      */
     public get wallet() {
-        return new Wallet(this.api, this.id);
+        return new CharacterWallet(this.api, this.id);
     }
 }
