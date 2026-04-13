@@ -4,7 +4,6 @@ export * from "./Calendar";
 export * from "./Character";
 export * from "./Colony";
 export * from "./Contacts";
-export * from "./Contracts";
 export * from "./Corporation";
 export * from "./Fittings";
 export * from "./Fleet";
