@@ -6,8 +6,6 @@ export const createAuthMiddleware = (
     tokenProvider?: TokenProvider,
 ): Middleware => {
     return async (ctx: EsiContext, next: NextFunction): Promise<void> => {
-        console.log("AUTH MIDDLEWARE!");
-
         if (!ctx.state.isAuthRequired) {
             return next();
         }

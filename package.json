@@ -5,12 +5,35 @@
     "main": "./dist/index.js",
     "typings": "./dist/index.d.ts",
     "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "keywords": [
+        "eve-online",
+        "esi",
+        "eve",
+        "api",
+        "wrapper",
+        "typescript",
+        "sso"
+    ],
     "scripts": {
         "lint": "eslint . --max-warnings 0",
         "type-check": "tsc --noEmit",
         "build": "tsdown",
         "dev": "tsx src/index.ts",
-        "generate": "tsx scripts/generate.ts"
+        "generate": "tsx scripts/generate.ts",
+        "prepublishOnly": "yarn lint && yarn type-check && yarn build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/strata-eve/esi.git"
     },
     "license": "MIT",
     "devDependencies": {

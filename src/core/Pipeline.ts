@@ -1,8 +1,10 @@
 export interface EsiContext {
     request: {
         route: string;
+        path: string;
         method: "GET" | "POST" | "PUT" | "DELETE";
         headers: Headers;
+        query?: Record<string, unknown>;
         body?: unknown;
     };
     response?: {

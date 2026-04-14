@@ -120,7 +120,7 @@ export class PublicUniverse {
         return new UniverseSystem(this.api, id);
     }
 
-    public async types() {
+    public get types() {
         return new UniverseTypes(this.api);
     }
 

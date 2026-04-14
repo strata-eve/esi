@@ -16,6 +16,11 @@ import {
     PublicContract,
 } from "../domains";
 import { PublicUniverse } from "../domains/universe/Universe";
+import {
+    CacheStore,
+    createCacheMiddleware,
+    MemoryCacheStore,
+} from "../middlewares/cache";
 
 /**
  * Configuration object for the HTTP User-Agent header.
@@ -79,6 +84,8 @@ export interface EsiClientOptions {
      * when the client requests an authenticated endpoint.
      */
     tokenProvider?: TokenProvider;
+
+    cacheStore?: CacheStore;
 }
 
 /**
@@ -149,6 +156,9 @@ export class EsiClient implements EsiRequester {
         this.pipeline.use(createAuthMiddleware(options.tokenProvider));
         this.pipeline.use(createRateLimitMiddleware(this.queueManager));
 
+        const cacheStore = options.cacheStore || new MemoryCacheStore();
+        this.pipeline.use(createCacheMiddleware(cacheStore));
+
         this.pipeline.use(async (ctx, next) => {
             ctx.request.headers.set("User-Agent", this.formattedUserAgent);
             await this.httpClient.request(ctx);
@@ -196,7 +206,7 @@ export class EsiClient implements EsiRequester {
         let route = options.path;
 
         const safeQuery = options.query
-            ? camelToSnakeObj(options.query)
+            ? (camelToSnakeObj(options.query) as Record<string, unknown>)
             : undefined;
 
         if (safeQuery) {
@@ -225,9 +235,11 @@ export class EsiClient implements EsiRequester {
         const ctx: EsiContext = {
             request: {
                 method: options.method,
+                path: options.path,
                 route,
                 headers,
                 body: safeBody,
+                query: safeQuery,
             },
             state: {
                 rateLimitGroup: options.rateLimitGroup || "default",
