@@ -1,9 +1,9 @@
 {
     "name": "@strata-eve/esi",
     "description": "A fully typed, auto-generated wrapper for the Eve Online ESI.",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "main": "./dist/index.js",
-    "typings": "./dist/index.d.ts",
+    "types": "./dist/index.d.ts",
     "type": "module",
     "exports": {
         ".": {
@@ -11,6 +11,9 @@
             "import": "./dist/index.js"
         }
     },
+    "files": [
+        "dist"
+    ],
     "publishConfig": {
         "access": "public"
     },

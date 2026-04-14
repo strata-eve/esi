@@ -10,3 +10,5 @@ export * from "./domains";
 export * from "./api/GeneratedApi";
 
 export * from "./core/errors";
+
+export type { CacheStore, CacheEntry } from "./middlewares/cache";

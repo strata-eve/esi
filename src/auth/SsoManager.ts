@@ -18,6 +18,7 @@ export interface SsoConfiguration {
 export interface AuthorizationRequest {
     url: string;
     state: string;
+    codeVerifier?: string;
 }
 
 export interface EsiTokenResponse {
@@ -25,6 +26,11 @@ export interface EsiTokenResponse {
     expires_in: number;
     token_type: string;
     refresh_token: string;
+}
+
+export interface TokenExchangeOptions {
+    clientSecret?: string;
+    codeVerifier?: string;
 }
 
 export class SsoManager {
@@ -42,6 +48,17 @@ export class SsoManager {
                 "SsoManager requires both clientId and redirectUri.",
             );
         }
+    }
+
+    public generatePkcePair(): { verifier: string; challenge: string } {
+        const verifier = crypto.randomBytes(32).toString("base64url");
+
+        const challenge = crypto
+            .createHash("sha256")
+            .update(verifier)
+            .digest("base64url");
+
+        return { verifier, challenge };
     }
 
     public async verifyToken(token: string): Promise<ValidatedEveToken> {
@@ -89,25 +106,30 @@ export class SsoManager {
 
     public async refreshToken(
         refreshToken: string,
-        clientSecret: string,
+        clientSecret?: string,
     ): Promise<EsiTokenResponse> {
-        const authHeader = Buffer.from(
-            `${this.config.clientId}:${clientSecret}`,
-        ).toString("base64");
-
         const body = new URLSearchParams({
             grant_type: "refresh_token",
             refresh_token: refreshToken,
+            client_id: this.config.clientId,
         });
+
+        const headers = new Headers({
+            "Content-Type": "application/x-www-form-urlencoded",
+            Host: "login.eveonline.com",
+            "User-Agent": "@strata/esi 0.1",
+        });
+
+        if (clientSecret) {
+            const authHeader = Buffer.from(
+                `${this.config.clientId}:${clientSecret}`,
+            ).toString("base64");
+            headers.set("Authorization", `Basic ${authHeader}`);
+        }
 
         const response = await fetch(this.tokenEndpoint, {
             method: "POST",
-            headers: {
-                Authorization: `Basic ${authHeader}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-                Host: "login.eveonline.com",
-                "User-Agent": "@strata/esi 0.1 (yetistirenarda@gmail.com)",
-            },
+            headers,
             body: body.toString(),
         });
 
@@ -134,6 +156,7 @@ export class SsoManager {
     public getAuthorizationUrl(
         scopes: EsiScope[] = [],
         customState?: string,
+        usePkce: boolean = true,
     ): AuthorizationRequest {
         const state = customState || crypto.randomBytes(16).toString("hex");
 
@@ -148,33 +171,53 @@ export class SsoManager {
             params.append("scope", scopes.join(" "));
         }
 
+        let codeVerifier: string | undefined;
+
+        if (usePkce) {
+            const pkce = this.generatePkcePair();
+            codeVerifier = pkce.verifier;
+            params.append("code_challenge", pkce.challenge);
+            params.append("code_challenge_method", "S256");
+        }
+
         return {
             url: `${this.authorizationEndpoint}?${params.toString()}`,
             state,
+            codeVerifier,
         };
     }
 
     public async exchangeCodeForToken(
         code: string,
-        clientSecret: string,
+        options: TokenExchangeOptions,
     ): Promise<EsiTokenResponse> {
-        const authHeader = Buffer.from(
-            `${this.config.clientId}:${clientSecret}`,
-        ).toString("base64");
-
         const payload = new URLSearchParams({
             grant_type: "authorization_code",
-            code: code,
+            code,
+            client_id: this.config.clientId,
         });
+
+        const headers = new Headers({
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "@strata/esi v0.1",
+        });
+
+        if (options.clientSecret) {
+            const authHeader = Buffer.from(
+                `${this.config.clientId}:${options.clientSecret}`,
+            ).toString("base64");
+
+            headers.set("Authorization", `Basic ${authHeader}`);
+        }
+
+        if (options.codeVerifier) {
+            payload.append("code_verifier", options.codeVerifier);
+        }
 
         const response = await fetch(this.tokenEndpoint, {
             method: "POST",
-            headers: {
-                Authorization: `Basic ${authHeader}`,
-                Accept: "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "User-Agent": "@strata/esi v0.1",
-            },
+            headers,
             body: payload.toString(),
         });
 
